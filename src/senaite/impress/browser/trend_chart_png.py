@@ -299,7 +299,7 @@ class TrendChartPNG(BrowserView):
 
         # Mensaje si no hay datos
         if not series or not any(s.get('data') for s in series) or pts_max < 2:
-            msg = u'Sin datos suficientes para gráfico'
+            msg = u''
             tw, th = dr.textsize(msg, font=font)
             dr.text(((W2 - tw) / 2, (H2 - th) / 2), msg, fill=(100, 100, 100), font=font)
             out = StringIO()
