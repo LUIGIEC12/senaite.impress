@@ -3,6 +3,24 @@
 
 <!-- ===== Estilos para resaltar signos/leyendas ===== -->
 <style>
+/* Fila completa fuera de rango LUIGI*/
+.row-out-range {
+  background-color: #f8d7da !important; /* rojo suave */
+}
+.cell-out-range {
+  background-color: #f8d7da !important;
+  font-weight: bold;
+}
+
+.cell-critical {
+  background-color: #f5c6cb !important;
+  font-weight: bold;
+}
+/* Crítico LUIGI*/
+.row-critical {
+  background-color: #f5c6cb !important;
+}
+
   /* Colores semánticos y accesibles (clínicos) */
   .flag-ok       { color:#198754 !important; font-weight:700; } /* ✓ en rango (verde) */
   .fr-alert      { color:#d9534f !important; font-weight:700; } /* ⚠ fuera de rango (rojo) */
@@ -56,7 +74,13 @@
 
 <table class="table table-sm table-condensed">
   <thead>
-    <tr>
+    <tr tal:attributes="
+    class python: (
+        (out_rng or out_qual) and 'row-out-range' or
+        (is_crit and 'row-critical') or
+        ''
+    )
+">
       <th i18n:translate="">Análisis</th>
       <th i18n:translate="">Resultado</th>
       <th i18n:translate="">Unidad</th>
@@ -80,7 +104,14 @@
       ">
         <tr>
           <td tal:content="python:r['name']">Análisis</td>
-          <td tal:content="python:r['result']">—</td>
+          <td tal:attributes="
+    class python: (
+        (out_rng or out_qual) and 'cell-out-range' or
+        (is_crit and 'cell-critical') or
+        ''
+    )
+"
+tal:content="python:r['result']">—</td>
 
           <!-- Unidad: excluida del colorizer -->
           <td class="unit" tal:content="python:r.get('unit') or u''">—</td>
