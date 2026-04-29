@@ -249,8 +249,8 @@ class TrendChartPNG(BrowserView):
             series = new_series
 
         # Canvas: W/H adaptativos si no llegan
-        pts_per_series = [len(s['data']) for s in series] or [0]
-        pts_max = max(pts_per_series)
+        pts_per_series = [len(s.get('data') or []) for s in series]
+        pts_max = max(pts_per_series) if pts_per_series else 0
         n_series = len(series)
 
         if W_param is None or H_param is None:
@@ -316,12 +316,16 @@ class TrendChartPNG(BrowserView):
 
         # ==== Preparación de X y Y ====
         # Y-range “bonito”
-        ys = [y for s in series for (_, y) in s['data']]
+        ys = [y for s in series for (_, y) in (s.get('data') or [])]
+        if not ys:
+            return ''
         ymin = min(ys); ymax = max(ys)
         ymin, ymax, yticks = self._nice_range(ymin, ymax)
 
         # Timestamps (para modo tiempo y para construir referencia global)
-        all_ms = [ms for s in series for (ms, _) in s['data']]
+        all_ms = [ms for s in series for (ms, _) in (s.get('data') or [])]
+        if not all_ms:
+            return ''
         if not all_ms:
             all_ms = [0]
         xmin = min(all_ms); xmax = max(all_ms)
