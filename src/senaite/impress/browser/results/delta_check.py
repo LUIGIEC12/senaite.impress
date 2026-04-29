@@ -856,25 +856,25 @@ class InfolabsaDeltaCheck(BrowserView):
                     "categories_ddmmyy": [pt['ddmmyy'] for pt in points],
                 })
 
-            if len(points) < 2 or val_now is None:
+            if len(points) < 2 or val_now is None: # luigi
                 continue
 
+            prev_raw, prev_num = self._find_prev_value_in_ar(prev_ar_global, keys)
 
-             prev_raw, prev_num = self._find_prev_value_in_ar(prev_ar_global, keys)
+            delta_abs = None
+            delta_pct = None
+            delta_dir = u"∙"
+            alerta = False
 
-             delta_abs = None
-             delta_pct = None
-             delta_dir = u"∙"
-             alerta = False
-            # Validación real: debe existir valor anterior ag LUIGI
+            # Validación real: debe existir valor anterior
             if prev_num is not None and val_now is not None:
                 try:
                     actual = float(val_now)
                     anterior = float(prev_num)
 
                     delta_abs = actual - anterior
- 
-                   # porcentaje
+
+                    # porcentaje
                     if anterior != 0:
                         pct = (delta_abs / abs(anterior)) * 100.0
                         delta_pct = round(pct, 2)
@@ -885,20 +885,20 @@ class InfolabsaDeltaCheck(BrowserView):
                     if actual > anterior:
                         delta_dir = u"▲"
                     elif actual < anterior:
-                         delta_dir = u"▼"
+                        delta_dir = u"▼"
                     else:
                         delta_dir = u"Δ"
 
-                # NUEVO: VALIDACIÓN DE ALERTA (20% por defecto)
-                   limite = 20
-                   if abs(delta_pct) > limite:
-                       alerta = True
+                    # VALIDACIÓN DE ALERTA (20%)
+                    limite = 20
+                    if abs(delta_pct) > limite:
+                        alerta = True
 
-             except Exception:
-                 continue
-          else:
-           continue  #  NO mostrar si no hay datos suficientes
-
+                except Exception:
+                    continue
+            else:
+                continue  # no hay dato previo válido
+              
             prev_id = u"—"
             prev_date = u"—"
             prev_date_fmt = u"—"
