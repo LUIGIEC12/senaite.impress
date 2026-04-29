@@ -859,26 +859,45 @@ class InfolabsaDeltaCheck(BrowserView):
             if len(points) < 2 or val_now is None:
                 continue
 
-            prev_raw, prev_num = self._find_prev_value_in_ar(prev_ar_global, keys)
 
-            delta_abs = None
-            delta_pct = u"N/A"
-            delta_dir = u"∙"
+             prev_raw, prev_num = self._find_prev_value_in_ar(prev_ar_global, keys)
 
-            if prev_num is not None:
+             delta_abs = None
+             delta_pct = None
+             delta_dir = u"∙"
+             alerta = False
+            # Validación real: debe existir valor anterior ag LUIGI
+            if prev_num is not None and val_now is not None:
                 try:
-                    delta_abs = float(val_now) - float(prev_num)
-                    if prev_num != 0:
-                        pct = ((float(val_now) - float(prev_num)) / abs(float(prev_num))) * 100.0
-                        delta_pct = u"%.1f%%" % pct
-                    if float(val_now) > float(prev_num):
+                    actual = float(val_now)
+                    anterior = float(prev_num)
+
+                    delta_abs = actual - anterior
+ 
+                   # porcentaje
+                    if anterior != 0:
+                        pct = (delta_abs / abs(anterior)) * 100.0
+                        delta_pct = round(pct, 2)
+                    else:
+                        delta_pct = 0
+
+                    # dirección
+                    if actual > anterior:
                         delta_dir = u"▲"
-                    elif float(val_now) < float(prev_num):
-                        delta_dir = u"▼"
+                    elif actual < anterior:
+                         delta_dir = u"▼"
                     else:
                         delta_dir = u"Δ"
-                except Exception:
-                    pass
+
+                # NUEVO: VALIDACIÓN DE ALERTA (20% por defecto)
+                   limite = 20
+                   if abs(delta_pct) > limite:
+                       alerta = True
+
+             except Exception:
+                 continue
+          else:
+           continue  #  NO mostrar si no hay datos suficientes
 
             prev_id = u"—"
             prev_date = u"—"
